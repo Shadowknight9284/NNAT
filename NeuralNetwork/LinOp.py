@@ -3,6 +3,12 @@ import matplotlib.lines as lines
 import matplotlib.transforms as transforms
 import numpy as np
 
+def linear(m,b,point):
+    return m*point[0]+b
+
+def softplus(m,b,point):
+    return m* np.log(1+np.e)**point[0] + b
+
 x = []
 y = []
 
@@ -28,12 +34,6 @@ pderivM = 0
 pderivB = 0
 epochs = 0
 L = 0.0001
-
-def linear(m,b,point):
-    return m*point[0]+b
-
-def softplus(m,b,point):
-    return m* np.log(1+np.e)**point[0] + b
 
 while epochs < 50000:
     print(f'EPOCH: {epochs}')

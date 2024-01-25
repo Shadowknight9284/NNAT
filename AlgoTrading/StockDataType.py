@@ -80,14 +80,6 @@ def calculate_rsi(symbol, start_date, end_date):
 
 
 
-
-
-
-
-
-
-
-
 # Test
 df = pd.read_csv('stocks.csv')
 stocks = []
