@@ -10,7 +10,7 @@ start_date = previous_date.strftime('%Y-%m-%d')
 print("Today's Date: " + start_date)
 
 
-
+# Think of more momentum based indicators to add to the stock data type
 class Stock:
     def __init__(self, ticker, closing, volume, SMA_5, SMA_50, RSI ):
         self.ticker = ticker
@@ -42,16 +42,13 @@ class Stock:
     def calcSMA_N(self, n):
         SMA_N = self.closing.rolling(window=n).mean()
         return SMA_N
-    
-    
-    
+
     def calc(self):
         self.closing = yf.download(self.ticker, start= start_date, end=today_date, progress=False)['Close']
         self.volume = yf.download(self.ticker, start= start_date, end=today_date, progress=False)['Volume']
         self.SMA_5 = self.calcSMA_N(5)
         self.SMA_50 = self.calcSMA_N(50)
         self.RSI = self.calcRSI()
-
     
     def display_info(self):
         closing = self.closing
@@ -65,23 +62,13 @@ class Stock:
         print(self.ticker + "\n" + str(self.RSI))
         # Print the latest 10 Days of Data for all stocks 
         
-
-def calculate_rsi(symbol, start_date, end_date):
-    data = yf.download(symbol, start=start_date, end=end_date, progress=False)['Close']
-    daily_change = data.diff()
-    gain = daily_change.where(daily_change > 0, 0)
-    loss = -daily_change.where(daily_change < 0, 0)
-    avg_gain = gain.rolling(window=14).mean()
-    avg_loss = loss.rolling(window=14).mean()
-    relative_strength = avg_gain / avg_loss
-    rsi = 100 - (100 / (1 + relative_strength))
-    return rsi
-
-
-
+        
+        
+        
+        
 
 # Test
-df = pd.read_csv('stocks.csv')
+df = pd.read_csv('stocks.csv')  
 stocks = []
 i = 0
 for index in df.iterrows():
@@ -95,5 +82,11 @@ for index in df.iterrows():
     i = i + 1
     
 end = time.time()
+
 print((end-start))
 
+df_stock = pd.DataFrame(stocks)
+
+
+# Make a array of stock objects
+# then make it 

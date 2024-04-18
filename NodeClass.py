@@ -1,12 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def node(m,b,input):
+    return
+# Make a a node with a weight, bias, and input then use SoftPlus as the activation funtion (temp) and then 
 
+ 
 def softplus(x):
     return np.log(1 + np.exp(x))
 
 def sigmoid(x):
     return np.exp(x)/(1+np.exp(x)) 
+
 xP = []
 yP = []
 points = [[0,3],[3,4],[6,8],[9,20],[13,8],[16,4],[19,0]]
@@ -15,7 +20,6 @@ for p in points:
     yP.append(p[1])
 m = 1
 b = 0 
-
 
 
 pderivM = 0
@@ -39,6 +43,8 @@ end_points = 20
 iter = 1000
 x = np.linspace(start_points, end_points, iter) 
 y = m*softplus(x)+b
+
+
 
 
 plt.plot(xP, yP, 's')
