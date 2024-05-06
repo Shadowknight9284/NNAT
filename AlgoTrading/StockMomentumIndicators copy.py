@@ -1,7 +1,6 @@
 import pandas as pd
 import yfinance as yf
 import time
-import yahoo_fin 
 from datetime import datetime, timedelta
 import numpy as np
 import sqlite3
@@ -13,7 +12,6 @@ today_date = datetime.today()
 previous_date = today_date - timedelta(days=100)
 start_date = previous_date.strftime('%Y-%m-%d')
 print("Today's Date: " + start_date)
-
 
 
 class Stock:
@@ -76,7 +74,7 @@ class Stock:
         data.to_csv('csvFolder/' + self.ticker + '_data.csv')
         
     def to_sql(self):
-        conn = sqlite3.connect('') #add a path to the database
+        conn = sqlite3.connect('sqlFolder/' + self.ticker + '_data.csv') #add a path to the database
         data = pd.concat([self.high, self.low, self.closing, self.volume, self.open], axis=1)
         data.columns = ['High', 'Low', 'Closing', 'Volume', 'Open']
         data.to_sql(self.ticker, conn, if_exists='replace')

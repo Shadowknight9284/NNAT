@@ -1,36 +1,108 @@
-import yfinance as yf
 import pandas as pd
+import yfinance as yf
+import time
+import yahoo_fin 
+from datetime import datetime, timedelta
+import numpy as np
+import sqlite3
+import csv
+import matplotlib.pyplot as plt
 
-def calculate_rsi(symbol, start_date, end_date):
-    # Fetch historical stock closing prices
-    data = yf.download(symbol, start=start_date, end=end_date, progress=False)['Close']
+start = time.time()
+today_date = datetime.today()
+previous_date = today_date - timedelta(days=100)
+start_date = previous_date.strftime('%Y-%m-%d')
+print("Today's Date: " + start_date)
 
-    # Calculate daily price changes
-    daily_change = data.diff()
 
-    # Calculate average gain and average loss
-    gain = daily_change.apply(lambda x: x if x > 0 else 0)
-    loss = -daily_change.apply(lambda x: x if x < 0 else 0)
+class Stock:
+    def __init__(self, ticker, closing, volume, high, low):
+        self.ticker = ticker
+        self.closing = closing
+        self.volume = volume
+        self.high = high
+        self.low = low
+        
+    def __init__(self, ticker):
+        self.ticker = ticker
+        self.closing = [0]
+        self.volume = [0]
+        self.high = [0]
+        self.low = [0]
 
-    # Calculate rolling average over a specified period (e.g., 14 days)
-    avg_gain = gain.rolling(window=14).mean()
-    avg_loss = loss.rolling(window=14).mean()
+    def calc(self):
+        self.closing = yf.download(self.ticker, start= start_date, end=today_date, progress=False)['Close']
+        self.volume = yf.download(self.ticker, start= start_date, end=today_date, progress=False)['Volume']
+        self.open = yf.download(self.ticker, start= start_date, end=today_date, progress=False)['Open']
+        self.high = yf.download(self.ticker, start= start_date, end=today_date, progress=False)['High']
+        self.low = yf.download(self.ticker, start= start_date, end=today_date, progress=False)['Low']
+        
+    
+    def display_infoToday(self):
+        print(f"Stock: {self.ticker}")
+        print(f"Closing Price: {self.closing.iloc[-1]}")
+        print(f"Volume: {self.volume.iloc[-1]}")
+        print(f"Open Price: {self.open.iloc[-1]}")
+        print(f"High Price: {self.high.iloc[-1]}")
+        print(f"Low Price: {self.low.iloc[-1]}")
 
-    # Calculate relative strength (RS)
-    relative_strength = avg_gain / avg_loss
+    def to_csv(self):
+        data = pd.concat([self.high, self.low, self.closing, self.volume, self.open], axis=1)
+        data.columns = ['High', 'Low', 'Closing', 'Volume', 'Open']
+        data.to_csv('csvFolder/' + self.ticker + '_data.csv')
+        
+    def to_sql(self):
+        conn = sqlite3.connect('') #add a path to the database
+        data = pd.concat([self.high, self.low, self.closing, self.volume, self.open], axis=1)
+        data.columns = ['High', 'Low', 'Closing', 'Volume', 'Open']
+        data.to_sql(self.ticker, conn, if_exists='replace')
+        
+    def plotHigh(self):
+        plt.plot(self.high)
+        plt.title('High Price')
+        plt.show()
+        
+    def plotLow(self):
+        plt.plot(self.low)
+        plt.title('Low Price')
+        plt.show()
+        
+    def plotClosing(self):
+        plt.plot(self.closing)
+        plt.title('Closing Price')
+        plt.show()
+        
+    def plotOpen(self):
+        plt.plot(self.open)
+        plt.title('Opening Price')
+        plt.show()
+        
+    def plotVolume(self):
+        plt.plot(self.volume)
+        plt.title('Volume')
+        plt.show()
+        
+# Test
+stock_csv = "test.csv"
+df = pd.read_csv(stock_csv)  
+stocks = []
+i = 0
 
-    # Calculate RSI
-    rsi = 100 - (100 / (1 + relative_strength))
+for index in df.iterrows():
+    stocks.append(Stock(df.iloc[i,0]))
+    try:
+        test = stocks[i]
+        test.calc()
+        test.display_infoToday()
+        test.to_csv()
 
-    # Create a new DataFrame with Date and RSI columns
-    rsi_values = rsi.tolist()
+    except Exception as e:
+        print(f"Skipping {test.ticker}. Error: {e} Index: {i}")
+    i = i + 1
+    
+end = time.time()
 
-    return rsi_values
+print(f"Time taken: {end-start} seconds")
 
-# Example usage
-symbol = 'AAPL'  # Replace with the desired stock symbol
-start_date = '2022-01-01'
-end_date = '2022-12-31'
-
-rsi_result = calculate_rsi(symbol, start_date, end_date)
-print(rsi_result)
+# Make a array of stock objects
+# then make it 
